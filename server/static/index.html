@@ -1,117 +1,92 @@
 <html>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <title>Just Shape It!</title>
+</head>
 <body>
 
-<div>edges2cats</div>
-<div id="edges2cats"></div>
 
-<div>edges2shoes</div>
-<div id="edges2shoes"></div>
+  <main role="main" class="container-fluid">
+  <div class="row justify-content-center">
+      <div id="edges2beach" class="col4"></div>
+    </div>
+    <div class="row justify-content-center">
+      <div id="edges2airliner"></div>
+    </div>
+    <div class="row justify-content-center">
+      <p>Happily forked from the excellent Interactive showcase by <a href="https://twitter.com/christophrhesse">Christopher Hesse</a> at <a href="https://affinelayer.com/pixsrv/">https://affinelayer.com/pixsrv/</a></p>
+    </div>
+    <div class="row justify-content-center">
+      <p>The beach model was trained with ~300 images, the airliner model with ~1000 images, all from  <a href="http://www.image-net.org/">imagenet</a> </p>
+    </div>
+</div>
+  </main><!-- /.container -->
 
-<div>edges2handbags</div>
-<div id="edges2handbags"></div>
+  <script src="deeplearn-0.3.15.js"></script>
+  <script>
 
-<div>facades</div>
-<div id="facades"></div>
+    var editor_background = new Image()
+    editor_background.src = "editor.png"
 
-<script src="deeplearn-0.3.15.js"></script>
-<script>
+    var DEBUG = false
+    var SIZE = 256
 
-var editor_background = new Image()
-editor_background.src = "editor.png"
+    var editors = []
+    var request_in_progress = false
 
-var DEBUG = false
-var SIZE = 256
+    function main() {
+      var create_editor = function(config) {
+        var editor = new Editor(config)
+        var elem = document.getElementById(config.name)
+        elem.appendChild(editor.view.ctx.canvas)
+        editors.push(editor)
+      }
 
-var editors = []
-var request_in_progress = false
+      create_editor({
+        name: "edges2beach",
+        weights_url: "/models/edges2beach_AtoB.pict",
+        mode: "line",
+        clear: "#FFFFFF",
+        colors: {
+          line: "#005EB8",
+          eraser: "#ffffff",
+        },
+        draw: "#005EB8",
+        initial_input: "/edges2beach-input.png",
+        initial_output: "/edges2beach-output.png",
+        sheet_url: "/edges2beach-sheet.jpg",
+      })
 
-function main() {
-  var create_editor = function(config) {
-    var editor = new Editor(config)
-    var elem = document.getElementById(config.name)
-    elem.appendChild(editor.view.ctx.canvas)
-    editors.push(editor)
-  }
+      create_editor({
+        name: "edges2airliner",
+        weights_url: "/models/edges2airliner_AtoB.pict",
+        mode: "line",
+        clear: "#FFFFFF",
+        colors: {
+          line: "#005EB8",
+          eraser: "#ffffff",
+        },
+        draw: "#005EB8",
+        initial_input: "/edges2airliner-input.png",
+        initial_output: "/edges2airliner-output.png",
+        sheet_url: "/edges2airliner-sheet.jpg",
+      })
 
-  create_editor({
-    name: "edges2cats",
-    weights_url: "/models/edges2cats_AtoB.pict",
-    mode: "line",
-    clear: "#FFFFFF",
-    colors: {
-      line: "#000000",
-      eraser: "#ffffff",
-    },
-    draw: "#000000",
-    initial_input: "/edges2cats-input.png",
-    initial_output: "/edges2cats-output.png",
-    sheet_url: "/edges2cats-sheet.jpg",
-  })
+      window.requestAnimationFrame(frame)
+    }
+    window.onload = main
 
-  create_editor({
-    name: "edges2shoes",
-    weights_url: "/models/edges2shoes_AtoB.pict",
-    mode: "line",
-    clear: "#FFFFFF",
-    colors: {
-      line: "#000000",
-      eraser: "#ffffff",
-    },
-    draw: "#000000",
-    initial_input: "/edges2shoes-input.png",
-    initial_output: "/edges2shoes-output.png",
-    sheet_url: "/edges2shoes-sheet.jpg",
-  })
-
-  create_editor({
-    name: "edges2handbags",
-    weights_url: "/models/edges2handbags_AtoB.pict",
-    mode: "line",
-    clear: "#FFFFFF",
-    colors: {
-      line: "#000000",
-      eraser: "#ffffff",
-    },
-    draw: "#000000",
-    initial_input: "/edges2handbags-input.png",
-    initial_output: "/edges2handbags-output.png",
-    sheet_url: "/edges2handbags-sheet.jpg",
-  })
-
-  create_editor({
-    name: "facades",
-    weights_url: "/models/facades_BtoA.pict",
-    mode: "rect",
-    colors: {
-      background: "#0006d9",
-      wall: "#0d3dfb",
-      door: "#a50000",
-      "window": "#0075ff",
-      "window sill": "#68f898",
-      "window head": "#1dffdd",
-      shutter: "#eeed28",
-      balcony: "#b8ff38",
-      trim: "#ff9204",
-      cornice: "#ff4401",
-      column: "#f60001",
-      entrance: "#00c9ff",
-    },
-    clear: "#0d3dfb",
-    draw: "#0075ff",
-    initial_input: "/facades-input.png",
-    initial_output: "/facades-output.png",
-    sheet_url: "/facades-sheet.jpg",
-  })
-
-  window.requestAnimationFrame(frame)
-}
-window.onload = main
-
-function render() {
-  for (var i = 0; i < editors.length; i++) {
-    editors[i].render()
-  }
-}
+    function render() {
+      for (var i = 0; i < editors.length; i++) {
+        editors[i].render()
+      }
+    }
 
 
 // model
@@ -453,7 +428,7 @@ Editor.prototype = {
         v.ctx.fillText(s, (v.f.width - v.ctx.measureText(s).width)/2, 15)
 
         v.frame("progress_bar", 0, 25, v.f.width, 15, () => {
-          v.ctx.fillStyle = "#f92672"
+          v.ctx.fillStyle = "#005EB8"
           v.ctx.fillRect(0, 0, v.f.width * this.progress, v.f.height)
         })
       } else if (request_in_progress) {
@@ -784,9 +759,9 @@ View.prototype = {
   push_frame: function(name, x, y, width, height) {
     this.ctx.save()
     this.ctx.translate(x, y)
-  	var current = this.frames[this.frames.length - 1]
-  	var next = {name: name, offset_x: current.offset_x + x, offset_y: current.offset_y + y, width: width, height: height}
-  	this.frames.push(next)
+    var current = this.frames[this.frames.length - 1]
+    var next = {name: name, offset_x: current.offset_x + x, offset_y: current.offset_y + y, width: width, height: height}
+    this.frames.push(next)
     this.f = next
   },
   pop_frame: function() {
@@ -845,7 +820,7 @@ function do_button(v, text) {
     if (v.contains(mouse_pos)) {
       animate(name, parse_color("#f477a5FF"), 100)
     } else {
-      animate(name, parse_color("#f92672FF"), 100)
+      animate(name, parse_color("#005EB8FF"), 100)
     }
   }
 
@@ -993,11 +968,11 @@ function rgba(v) {
 
 var parse_color = function(c) {
 	return [
-		parseInt(c.substr(1,2), 16) / 255,
-		parseInt(c.substr(3,2), 16) / 255,
-		parseInt(c.substr(5,2), 16) / 255,
-    parseInt(c.substr(7,2), 16) / 255,
-	]
+  parseInt(c.substr(1,2), 16) / 255,
+  parseInt(c.substr(3,2), 16) / 255,
+  parseInt(c.substr(5,2), 16) / 255,
+  parseInt(c.substr(7,2), 16) / 255,
+  ]
 }
 
 document.addEventListener("mousemove", function(e) {
@@ -1018,7 +993,74 @@ document.addEventListener("mouseup", function(e) {
   update()
 })
 
-</script>
+// Prevent scrolling when touching the canvas
+// document.addEventListener("touchstart", function (e) {
 
-</body>
-</html>
+//   //e.preventDefault();
+//   drag_start = {x: e.clientX, y: e.clientY}
+
+//   mouse_down = true
+//   mouse_pressed = true
+//   update()
+
+// }, false)
+// document.addEventListener("touchend", function (e) {
+
+//   //e.preventDefault();
+//   mouse_down = false
+//   mouse_released = true
+//   update()
+
+// }, false)
+// document.addEventListener("touchmove", function (e) {
+
+//   //e.preventDefault();
+//   mouse_pos = {x: e.clientX, y: e.clientY}
+//   update()
+
+// }, false)
+// Set up touch events for mobile, etc
+document.addEventListener("touchstart", function (e) {
+  mousePos = getTouchPos(document, e);
+  var touch = e.touches[0];
+  var mouseEvent = new MouseEvent("mousedown", {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  document.dispatchEvent(mouseEvent);
+}, false);
+document.addEventListener("touchend", function (e) {
+  var mouseEvent = new MouseEvent("mouseup", {});
+  document.dispatchEvent(mouseEvent);
+}, false);
+document.addEventListener("touchmove", function (e) {
+  var touch = e.touches[0];
+  var mouseEvent = new MouseEvent("mousemove", {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  document.dispatchEvent(mouseEvent);
+}, false);
+
+// Get the position of a touch relative to the canvas
+function getTouchPos(canvasDom, touchEvent) {
+  //var rect = canvasDom.getBoundingClientRect();
+  return {
+    x: touchEvent.touches[0].clientX ,
+    y: touchEvent.touches[0].clientY 
+  };
+}
+
+
+
+</script>
+    <!-- Bootstrap core JavaScript
+      ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+      <script src="../../../../assets/js/vendor/popper.min.js"></script>
+      <script src="../../../../dist/js/bootstrap.min.js"></script>
+
+    </body>
+    </html>
